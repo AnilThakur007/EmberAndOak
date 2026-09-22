@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember &amp; Oak — Wood-Fired Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15100C; --panel:#1E1712; --panel2:#241C15; --line:rgba(244,236,223,0.1);
+    --cream:#F4ECDF; --cream-dim:#B9AB98; --ember:#E2572B; --ember2:#F2884F;
+    --oak:#8B5E3C; --gold:#C99A4A;
+    --shadow:0 20px 50px rgba(0,0,0,0.45);
+  }
+  body.light{
+    --ink:#F6F0E6; --panel:#FFFFFF; --panel2:#FBF5EA; --line:rgba(30,22,15,0.1);
+    --cream:#1E160F; --cream-dim:#6B5D4C; --shadow:0 16px 40px rgba(60,40,20,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--ink);color:var(--cream);
+    font-family:'Outfit',sans-serif;font-size:15.5px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;transition:background .4s ease,color .4s ease;
+  }
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;margin:0;font-weight:600;letter-spacing:0.01em;color:var(--cream);}
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:'Outfit';cursor:pointer;border:none;background:none;color:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px;}}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ember2);margin-bottom:14px;}
+  ::selection{background:var(--ember);color:#fff;}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(21,16,12,0.82);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    transition:background .4s ease,border-color .4s ease;
+  }
+  body.light .nav{background:rgba(246,240,230,0.85);}
+  .nav-inner{max-width:1180px;margin:0 auto;padding:0 32px;height:78px;display:flex;align-items:center;justify-content:space-between;}
+  @media(max-width:640px){.nav-inner{padding:0 20px;height:66px;}}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .mark{
+    width:38px;height:38px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--ember2), var(--ember) 60%, #8a2c10 100%);
+    box-shadow:0 0 18px rgba(226,87,43,0.55);flex:none;
+  }
+  .brand .word{font-family:'Cormorant Garamond';font-size:22px;font-weight:600;letter-spacing:0.02em;}
+  .brand .word em{font-style:italic;color:var(--ember2);}
+  .nav-links{display:flex;gap:38px;}
+  .nav-links a{font-size:13.5px;font-weight:500;color:var(--cream-dim);letter-spacing:0.02em;transition:.2s;position:relative;}
+  .nav-links a:hover{color:var(--cream);}
+  @media(max-width:860px){.nav-links{display:none;}}
+  .nav-r{display:flex;align-items:center;gap:16px;}
+  .theme-toggle{
+    width:46px;height:26px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);
+    position:relative;flex:none;
+  }
+  .theme-toggle .knob{
+    position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+    background:var(--ember);transition:transform .3s ease;box-shadow:0 2px 6px rgba(0,0,0,0.3);
+  }
+  body.light .theme-toggle .knob{transform:translateX(20px);}
+  .cart-btn{
+    display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);
+    padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;position:relative;
+  }
+  .cart-btn:hover{border-color:var(--ember);}
+  .cart-count{
+    background:var(--ember);color:#fff;font-size:10.5px;font-weight:800;
+    width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;padding:180px 0 120px 0;overflow:hidden;
+    background:
+      radial-gradient(ellipse 700px 460px at 78% 18%, rgba(226,87,43,0.28), transparent 65%),
+      radial-gradient(ellipse 520px 380px at 12% 85%, rgba(139,94,60,0.22), transparent 65%),
+      var(--ink);
+  }
+  @media(max-width:640px){.hero{padding:150px 0 84px 0;}}
+  .hero-inner{position:relative;z-index:2;max-width:680px;}
+  .hero h1{font-size:clamp(44px,7vw,78px);line-height:1;}
+  .hero h1 em{font-style:italic;color:var(--ember2);}
+  .hero p{margin-top:24px;font-size:17px;color:var(--cream-dim);max-width:46ch;line-height:1.7;}
+  .hero-cta{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap;}
+  .btn{padding:14px 28px;border-radius:999px;font-size:13.5px;font-weight:600;letter-spacing:0.03em;transition:.25s;}
+  .btn-ember{background:var(--ember);color:#fff;box-shadow:0 12px 30px -8px rgba(226,87,43,0.6);}
+  .btn-ember:hover{background:var(--ember2);transform:translateY(-2px);}
+  .btn-line{border:1px solid var(--line);color:var(--cream);}
+  .btn-line:hover{border-color:var(--ember2);color:var(--ember2);}
+  .hero-stats{display:flex;gap:40px;margin-top:56px;flex-wrap:wrap;}
+  .hstat b{display:block;font-family:'Cormorant Garamond';font-size:30px;color:var(--ember2);}
+  .hstat span{font-size:11.5px;color:var(--cream-dim);text-transform:uppercase;letter-spacing:0.08em;}
+  .ember-orb{
+    position:absolute;top:60px;right:6%;width:420px;height:420px;border-radius:50%;z-index:1;
+    background:radial-gradient(circle at 40% 35%, rgba(242,136,79,0.35), rgba(226,87,43,0.08) 55%, transparent 75%);
+    filter:blur(4px);animation:pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:0.7;transform:scale(1);}50%{opacity:1;transform:scale(1.06);}}
+
+  /* ---------- MENU ---------- */
+  .menu{padding:100px 0;}
+  .menu-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:44px;}
+  .menu-head h2{font-size:44px;}
+  .menu-head p{color:var(--cream-dim);margin-top:10px;max-width:50ch;font-size:14.5px;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:6px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;}
+  .tab{padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;color:var(--cream-dim);transition:.2s;white-space:nowrap;}
+  .tab:hover{color:var(--cream);}
+  .tab.on{background:var(--ember);color:#fff;}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:14px;}
+  @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+  .dish{
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;display:none;
+  }
+  .dish.show{display:block;animation:fadein .45s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .dish:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:rgba(226,87,43,0.35);}
+  .dish-img{
+    height:190px;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .dish-img::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.35) 100%);
+  }
+  .dish-emoji{font-size:52px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.35));position:relative;z-index:2;}
+  .dish-cat-pill{
+    position:absolute;top:12px;left:12px;z-index:3;background:rgba(21,16,12,0.65);backdrop-filter:blur(4px);
+    color:#fff;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);
+  }
+  .dish-body{padding:20px 22px 22px 22px;}
+  .dish-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .dish-top h3{font-size:21px;}
+  .dish-price{font-family:'Cormorant Garamond';font-size:20px;color:var(--ember2);font-weight:600;white-space:nowrap;}
+  .dish-desc{font-size:13px;color:var(--cream-dim);margin-top:8px;line-height:1.6;min-height:40px;}
+  .dish-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+  .dish-tag{font-size:10.5px;color:var(--cream-dim);letter-spacing:0.05em;text-transform:uppercase;}
+  .add-btn{
+    display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);
+    padding:9px 15px;border-radius:999px;font-size:12.5px;font-weight:600;transition:.2s;
+  }
+  .add-btn:hover{background:var(--ember);border-color:var(--ember);color:#fff;}
+  .add-btn.added{background:var(--ember);border-color:var(--ember);color:#fff;}
+
+  /* dish image palettes per category */
+  .bg-starter{background:linear-gradient(135deg,#5c7a52,#8B5E3C);}
+  .bg-main{background:linear-gradient(135deg,#8a2c10,#E2572B);}
+  .bg-dessert{background:linear-gradient(135deg,#6b3f22,#C99A4A);}
+  .bg-drink{background:linear-gradient(135deg,#3a2a4a,#8B5E3C);}
+
+  /* ---------- CHECKOUT ---------- */
+  .checkout{padding:100px 0;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .co-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;margin-top:40px;align-items:start;}
+  @media(max-width:900px){.co-grid{grid-template-columns:1fr;}}
+  .co-card{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:30px 30px 26px 30px;}
+  .co-card h3{font-size:20px;margin-bottom:20px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--cream-dim);margin-bottom:7px;letter-spacing:0.02em;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--ink);color:var(--cream);font-family:inherit;font-size:13.5px;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:480px){.row2{grid-template-columns:1fr;}}
+  .method-row{display:flex;gap:10px;margin-top:6px;}
+  .method-btn{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);text-align:center;font-size:12.5px;font-weight:600;color:var(--cream-dim);}
+  .method-btn.on{border-color:var(--ember);color:var(--ember2);background:rgba(226,87,43,0.08);}
+
+  .summary-card{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:26px;position:sticky;top:100px;}
+  .summary-card h3{font-size:19px;margin-bottom:16px;}
+  .sum-items{display:flex;flex-direction:column;gap:12px;max-height:280px;overflow-y:auto;padding-right:2px;}
+  .sum-empty{text-align:center;padding:36px 10px;color:var(--cream-dim);font-size:13px;border:1px dashed var(--line);border-radius:12px;}
+  .sum-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.3px;}
+  .sum-row .name{flex:1;min-width:0;}
+  .sum-row .name b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sum-row .name span{font-size:11.5px;color:var(--cream-dim);}
+  .qty-ctrl{display:flex;align-items:center;gap:8px;background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:3px 4px;}
+  .qty-ctrl button{width:20px;height:20px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--cream-dim);}
+  .qty-ctrl button:hover{color:var(--ember2);}
+  .qty-ctrl span{font-size:12px;font-weight:700;min-width:14px;text-align:center;}
+  .sum-line-total{font-weight:700;color:var(--ember2);white-space:nowrap;}
+  .sum-divider{height:1px;background:var(--line);margin:18px 0;}
+  .totals-row{display:flex;justify-content:space-between;font-size:13.5px;color:var(--cream-dim);margin-bottom:9px;}
+  .totals-row.grand{font-size:17px;color:var(--cream);font-weight:700;margin-top:4px;}
+  .totals-row.grand span:last-child{color:var(--ember2);font-family:'Cormorant Garamond';font-size:22px;}
+  .place-btn{width:100%;margin-top:20px;padding:15px;border-radius:12px;background:var(--ember);color:#fff;font-weight:700;font-size:14px;transition:.2s;}
+  .place-btn:hover{background:var(--ember2);}
+  .place-btn:disabled{background:var(--panel2);color:var(--cream-dim);cursor:not-allowed;}
+
+  /* ---------- CART DRAWER ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;opacity:0;pointer-events:none;transition:.3s;}
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--panel);
+    border-left:1px solid var(--line);z-index:201;transform:translateX(100%);transition:transform .35s ease;
+    display:flex;flex-direction:column;
+  }
+  .drawer.show{transform:translateX(0);}
+  .drawer-head{padding:24px 24px 18px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .drawer-head h3{font-size:22px;}
+  .drawer-close{width:34px;height:34px;border-radius:50%;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .drawer-body{flex:1;overflow-y:auto;padding:18px 24px;}
+  .drawer-foot{padding:20px 24px 26px 24px;border-top:1px solid var(--line);}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:70px 0 34px 0;}
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px;}
+  @media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:30px;}}
+  .foot-grid h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--cream-dim);margin-bottom:16px;}
+  .foot-grid p,.foot-grid a{display:block;font-size:13.5px;color:var(--cream-dim);margin-bottom:10px;}
+  .foot-grid a:hover{color:var(--ember2);}
+  .foot-bottom{margin-top:50px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--cream-dim);}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);z-index:300;
+    background:var(--ember);color:#fff;padding:14px 24px;border-radius:999px;font-size:13.5px;font-weight:600;
+    box-shadow:0 16px 40px -10px rgba(226,87,43,0.6);opacity:0;pointer-events:none;transition:.3s;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#home" class="brand">
+      <span class="mark"></span>
+      <span class="word">Ember <em>&amp;</em> Oak</span>
+    </a>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="#checkout">Checkout</a>
+      <a href="#" onclick="openCart(event)">Cart</a>
+    </div>
+    <div class="nav-r">
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"><span class="knob"></span></button>
+      <button class="cart-btn" onclick="openCart(event)">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="ember-orb"></div>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">Wood-fired · Open flame · Seasonal</div>
+    <h1>Fire, oak, and <em>flavor</em>, refined.</h1>
+    <p>Every dish at Ember &amp; Oak passes through open flame and cedar smoke before it reaches your table — a menu built around char, citrus, and patience.</p>
+    <div class="hero-cta">
+      <a href="#menu" class="btn btn-ember">View the menu</a>
+      <a href="#checkout" class="btn btn-line">Reserve a table</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><b>13</b><span>Signature dishes</span></div>
+      <div class="hstat"><b>4</b><span>Menu categories</span></div>
+      <div class="hstat"><b>620°</b><span>Oak-fired grill</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu wrap" id="menu">
+  <div class="menu-head">
+    <div>
+      <div class="eyebrow">The menu</div>
+      <h2>Crafted over open flame.</h2>
+      <p>Filter by course, or browse everything at once. Every item is fired fresh to order.</p>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-cat="all">All</button>
+      <button class="tab" data-cat="starter">Starters &amp; Salads</button>
+      <button class="tab" data-cat="main">Mains</button>
+      <button class="tab" data-cat="dessert">Desserts</button>
+      <button class="tab" data-cat="drink">Drinks</button>
+    </div>
+  </div>
+
+  <div class="grid" id="menuGrid"></div>
+</section>
+
+<!-- CHECKOUT -->
+<section class="checkout" id="checkout">
+  <div class="wrap">
+    <div class="eyebrow">Checkout</div>
+    <h2 style="font-size:38px;">Complete your order.</h2>
+    <div class="co-grid">
+      <div class="co-card">
+        <h3>Delivery details</h3>
+        <div class="field"><label>Full name</label><input type="text" placeholder="e.g. Jordan Blake"></div>
+        <div class="row2">
+          <div class="field"><label>Email</label><input type="email" placeholder="you@email.com"></div>
+          <div class="field"><label>Phone</label><input type="tel" placeholder="+1 (___) ___ ____"></div>
+        </div>
+        <div class="field"><label>Delivery address</label><textarea rows="2" placeholder="Street, city, zip"></textarea></div>
+        <div class="field">
+          <label>Payment method</label>
+          <div class="method-row">
+            <button type="button" class="method-btn on" data-method="card" onclick="setMethod(this)">Card</button>
+            <button type="button" class="method-btn" data-method="paypal" onclick="setMethod(this)">PayPal</button>
+            <button type="button" class="method-btn" data-method="cash" onclick="setMethod(this)">Cash on delivery</button>
+          </div>
+        </div>
+        <div class="row2" id="cardFields">
+          <div class="field"><label>Card number</label><input type="text" placeholder="•••• •••• •••• ••••"></div>
+          <div class="field"><label>Expiry</label><input type="text" placeholder="MM / YY"></div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h3>Order summary</h3>
+        <div class="sum-items" id="summaryItems"></div>
+        <div class="sum-divider"></div>
+        <div class="totals-row"><span>Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+        <div class="totals-row"><span>Delivery</span><span id="sumDelivery">$0.00</span></div>
+        <div class="totals-row"><span>Tax (8%)</span><span id="sumTax">$0.00</span></div>
+        <div class="totals-row grand"><span>Total</span><span id="sumTotal">$0.00</span></div>
+        <button class="place-btn" id="placeBtn" onclick="placeOrder()" disabled>Place order</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Ember &amp; Oak</h4>
+        <p style="max-width:34ch;">A wood-fired kitchen built around live flame, cedar smoke, and a menu that changes with the season.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>214 Kiln Street, Portland OR</p>
+        <p>Tue–Sun, 5pm – 11pm</p>
+        <p>(503) 555-0148</p>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">Reservations</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Ember &amp; Oak. Demo build for review.</span>
+      <span>Design &amp; interactive prototype — sample images are illustrative placeholders.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h3>Your cart</h3>
+    <button class="drawer-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <div class="totals-row grand" style="margin-bottom:14px;"><span>Subtotal</span><span id="drawerSubtotal">$0.00</span></div>
+    <a href="#checkout" class="btn btn-ember" style="display:block;text-align:center;" onclick="closeCart()">Go to checkout</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- Data ---------------- */
+const DISHES = [
+  { id:1, cat:'starter', emoji:'🍅', name:'Burrata & Heirloom', desc:'Creamy burrata, heirloom tomatoes, basil oil, aged balsamic.', price:18 },
+  { id:2, cat:'starter', emoji:'🐙', name:'Charred Octopus', desc:'Oak-charred octopus, smoked paprika, crushed potato, lemon.', price:22 },
+  { id:3, cat:'starter', emoji:'🥗', name:'Garden Citrus Salad', desc:'Blood orange, shaved fennel, pistachio, citrus vinaigrette.', price:16 },
+  { id:4, cat:'main', emoji:'🐟', name:'Cedar Plank Salmon', desc:'Cedar-smoked salmon, charred asparagus, brown butter.', price:34 },
+  { id:5, cat:'main', emoji:'🥩', name:'Oak-Grilled Ribeye', desc:'14oz ribeye over live oak, bone marrow butter, confit garlic.', price:58 },
+  { id:6, cat:'main', emoji:'🍝', name:'Truffle Tagliatelle', desc:'House tagliatelle, black truffle, aged parmesan, brown butter.', price:29 },
+  { id:7, cat:'main', emoji:'🍕', name:'Ember Margherita', desc:'Wood-fired sourdough base, San Marzano, fior di latte, basil.', price:24 },
+  { id:8, cat:'main', emoji:'🫓', name:'Fig & Prosciutto Flatbread', desc:'Charred flatbread, fig jam, prosciutto, gorgonzola, arugula.', price:23 },
+  { id:9, cat:'main', emoji:'🍗', name:'Flame-Kissed Half Chicken', desc:'Spatchcocked half chicken, herb brine, smoked jus.', price:31 },
+  { id:10, cat:'dessert', emoji:'🍫', name:'Dark Cacao Tiramisu', desc:'Espresso-soaked ladyfingers, dark cacao, mascarpone.', price:13 },
+  { id:11, cat:'dessert', emoji:'🥧', name:'Burnt Honey Tart', desc:'Torched honey custard, shortbread crust, sea salt.', price:14 },
+  { id:12, cat:'drink', emoji:'🍸', name:'Smoked Negroni', desc:'Cedar-smoked gin, campari, sweet vermouth, orange oil.', price:16 },
+  { id:13, cat:'drink', emoji:'🍊', name:'Citrus Spice', desc:'Blood orange, chili tincture, soda, charred citrus peel.', price:14 },
+];
+const CAT_LABEL = { starter:'Starter', main:'Main', dessert:'Dessert', drink:'Drink' };
+const CAT_BG = { starter:'bg-starter', main:'bg-main', dessert:'bg-dessert', drink:'bg-drink' };
+
+let cart = {}; // id -> qty
+let activeMethod = 'card';
+
+/* ---------------- Render menu ---------------- */
+function renderMenu(){
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = DISHES.map(d => `
+    <div class="dish show" data-cat="${d.cat}">
+      <div class="dish-img ${CAT_BG[d.cat]}">
+        <span class="dish-cat-pill">${CAT_LABEL[d.cat]}</span>
+        <span class="dish-emoji">${d.emoji}</span>
+      </div>
+      <div class="dish-body">
+        <div class="dish-top"><h3>${d.name}</h3><span class="dish-price">$${d.price.toFixed(2)}</span></div>
+        <p class="dish-desc">${d.desc}</p>
+        <div class="dish-foot">
+          <span class="dish-tag">Wood-fired</span>
+          <button class="add-btn" id="add-${d.id}" onclick="addToCart(${d.id})">+ Add to cart</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if(!btn) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  const cat = btn.dataset.cat;
+  document.querySelectorAll('.dish').forEach(d => {
+    const match = cat === 'all' || d.dataset.cat === cat;
+    d.classList.toggle('show', match);
+  });
+});
+
+/* ---------------- Cart logic ---------------- */
+function addToCart(id){
+  cart[id] = (cart[id] || 0) + 1;
+  const btn = document.getElementById('add-' + id);
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ Add to cart'; btn.classList.remove('added'); }, 1100);
+  syncCart();
+  showToast(DISHES.find(d => d.id === id).name + ' added to cart');
+}
+
+function changeQty(id, delta){
+  cart[id] = (cart[id] || 0) + delta;
+  if(cart[id] <= 0) delete cart[id];
+  syncCart();
+}
+
+function cartEntries(){
+  return Object.entries(cart).map(([id, qty]) => ({ dish: DISHES.find(d => d.id == id), qty }));
+}
+
+function subtotal(){
+  return cartEntries().reduce((sum, e) => sum + e.dish.price * e.qty, 0);
+}
+
+function syncCart(){
+  const entries = cartEntries();
+  const count = entries.reduce((s, e) => s + e.qty, 0);
+  document.getElementById('cartCount').textContent = count;
+
+  renderDrawer(entries);
+  renderSummary(entries);
+}
+
+function renderDrawer(entries){
+  const body = document.getElementById('drawerBody');
+  if(!entries.length){
+    body.innerHTML = '<div class="sum-empty">Your cart is empty.<br>Add something from the menu.</div>';
+  } else {
+    body.innerHTML = entries.map(e => `
+      <div class="sum-row" style="margin-bottom:16px;">
+        <div class="name"><b>${e.dish.name}</b><span>$${e.dish.price.toFixed(2)} each</span></div>
+        <div class="qty-ctrl">
+          <button onclick="changeQty(${e.dish.id},-1)">–</button>
+          <span>${e.qty}</span>
+          <button onclick="changeQty(${e.dish.id},1)">+</button>
+        </div>
+        <span class="sum-line-total">$${(e.dish.price*e.qty).toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+  document.getElementById('drawerSubtotal').textContent = '$' + subtotal().toFixed(2);
+}
+
+function renderSummary(entries){
+  const el = document.getElementById('summaryItems');
+  if(!entries.length){
+    el.innerHTML = '<div class="sum-empty">Nothing added yet</div>';
+  } else {
+    el.innerHTML = entries.map(e => `
+      <div class="sum-row">
+        <div class="name"><b>${e.qty}× ${e.dish.name}</b></div>
+        <span class="sum-line-total">$${(e.dish.price*e.qty).toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+  const sub = subtotal();
+  const delivery = sub > 0 ? 6 : 0;
+  const tax = sub * 0.08;
+  const total = sub + delivery + tax;
+  document.getElementById('sumSubtotal').textContent = '$' + sub.toFixed(2);
+  document.getElementById('sumDelivery').textContent = '$' + delivery.toFixed(2);
+  document.getElementById('sumTax').textContent = '$' + tax.toFixed(2);
+  document.getElementById('sumTotal').textContent = '$' + total.toFixed(2);
+  document.getElementById('placeBtn').disabled = sub === 0;
+}
+
+/* ---------------- Drawer open/close ---------------- */
+function openCart(e){ if(e) e.preventDefault(); document.getElementById('overlay').classList.add('show'); document.getElementById('drawer').classList.add('show'); }
+function closeCart(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('drawer').classList.remove('show'); }
+
+/* ---------------- Checkout ---------------- */
+function setMethod(btn){
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  activeMethod = btn.dataset.method;
+  document.getElementById('cardFields').style.display = activeMethod === 'card' ? 'grid' : 'none';
+}
+
+function placeOrder(){
+  if(subtotal() === 0) return;
+  const orderNo = 'EO-' + Math.floor(1000 + Math.random()*9000);
+  showToast('Order ' + orderNo + ' placed — thank you!');
+  cart = {};
+  syncCart();
+}
+
+/* ---------------- Theme ---------------- */
+function toggleTheme(){ document.body.classList.toggle('light'); }
+
+/* ---------------- Toast ---------------- */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------------- Init ---------------- */
+renderMenu();
+syncCart();
+</script>
+</body>
+</html>
